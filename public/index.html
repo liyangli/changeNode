@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>切换</title>
+    <style type="text/css">
+        .changeObj{
+            position: relative;
+            float:left;
+            margin-left:5px;
+            margin-top:2px;
+        }
+        .plant {
+            background-color: gray;
+            position: relative;
+            float: right;
+            width:100px;
+            height:30px;
+            text-align: center;
+            vertical-align: middle;
+            line-height: 30px;
+            border: 2px solid gray;
+            margin-left: 2px;
+        }
+    </style>
+    <script src="javascripts/jquery.js"></script>
+    <script>
+        //进行正式操作
+        var Change = function(){
+            this._init();
+        };
+        Change.prototype = {
+            _init: function(){
+                var _this = this;
+                //初始化方法
+                $("#plant").on("click",function(){
+                    _this._plantClick();
+                })
+            },
+            _plantClick: function(){
+                if(confirm("确定进行切换?")){
+                    var areaId = $(this).attr("data_id");
+                    var type = $(this).attr("data_type");
+                    $.post("change",{areaId:areaId,type:type},function(data){
+                        if(data.flag){
+                            alert("切换成功");
+                        }else{
+                            alert(data.error);
+                        }
+                    })
+                }
+            },
+            searchArea: function(){
+                var _this = this;
+                $.post('/areas',function(data){
+                    var msg = "";
+                    if(data){
+                        for(var i in data){
+                            var area = data[i];
+//                          msg += "<img data_areaId='"+area.id+"' src='"+area.image+"'>";
+//                          msg += area.name;
+//                          msg += "<div data_areaId='"+area.id+"' ><label>哈雷平台</label></div><div><label>数码平台</label></div>"
+                            msg += '<div class="changeObj">';
+                            msg += '<img id="areaImg_'+area.id+'" src="green.jpg"><label>'+area.name+'</label>';
+                            msg += '<div class="plant" data_id="'+area.id+'" data_type="hl" id="hl_'+area.id+'"><label>哈雷平台</label></div>';
+                            msg += '<div class="plant" data_id="'+area.id+'" data_type="sm"  id="sm_'+area.id+'"><label>数码平台</label></div>';
+                            msg += '</div>';
+                        }
+                    }
+                    $("#plantShow").html(msg);
+                    //
+                    _this.dyChange();
+                });
+
+            },
+            dyChange: function(){
+                //动态获取对应战时数据.每1S执行一下
+                $.post('./areaChange',function(data){
+                    //formart id ,status:0,1,2,hl:0,sm:0
+                    if(data){
+                        for(var i in data){
+                            var areaStatus = data[i];
+                            var id = areaStatus.id;
+                            change._changeImg(areaStatus);
+                            var hl = areaStatus.hl;
+                            var hlBackground = "";
+                            var smBackground = "";
+                            if(hl == "0"){
+                                //gray
+                                hlBackground = "gray";
+                            }else{
+                                //green
+                                hlBackground = "green";
+                            }
+                            $("#hl_"+id).css("background-color",hlBackground);
+                            var sm = areaStatus.sm;
+                            if(sm == "0"){
+                                //grep
+                                smBackground = "gray";
+                            }else{
+                                //organge
+                                smBackground = "orange"
+                            }
+                            $("#sm_"+id).css("background-color",smBackground);
+                        }
+                    }
+                });
+                setTimeout(change.dyChange,1000,1000);
+            },
+            _changeImg: function(areaStatus){
+                var status = areaStatus.status;
+                var id = areaStatus.id;
+                var imgUrl = "";
+                if(status == '0'){
+                    //green;
+                    imgUrl = "green.jpg";
+
+                }else if(status == "1"){
+                    //red;
+                    imgUrl = "red.jpg";
+                }else {
+                    //gred
+                    imgUrl = "gred.jpg";
+                }
+                $("#areaImg_"+id).attr("url",imgUrl);
+            },
+            showLog: function(){
+                //
+                $.post('logs',function(data){
+                    if(data){
+                        var msg = "";
+                        for(var i in data){
+                            var log = data[i];
+                            msg += log+"</br>";
+                        }
+                        $(".logShow").html(msg);
+                    }
+                });
+                setTimeout(change.showLog,1000,1000);
+            }
+        };
+        var change = new Change();
+        $(function(){
+            change.searchArea();
+            change.showLog();
+        });
+    </script>
+
+</head>
+<body>
+<!--现实具体内容,主要进行切换的内容-->
+<div style="height:200px;" id="plantShow">
+    <div class="changeObj">
+        <img src="green.jpg"><label>广州</label>
+        <div class="plant"><label>哈雷平台</label></div>
+        <div class="plant"><label>数码平台</label></div>
+    </div>
+</div>
+<!--显示切换数据的日志-->
+<div class="changeLog">
+    <div>切换日志</div>
+    <div class="logShow">
+
+    </div>
+</div>
+
+
+</body>
+</html>
