@@ -1,12 +1,64 @@
 extends layout
 block append head
   script(src="/javascript/change/index.js")
+    title #{title}
 
 block content
+
+  - age = 20
+  case age
+    when 0
+      | you age is 0
+    when 20
+      | you is liyangli
+    default
+      | hi hao are you?
+
+  ul
+    li.first: a(href='#') foo
+    li: a(href='#') bar
+    li.last: a(href='#') baz
+
+  ul
+    li.first
+      a(href='#') foo
+    li
+      a(href='#') bar
+    li.last
+      a(href='#') baz
+
+  - var html = "<script></script>"
+    | !{html}
+  label
+      | UsesName
+      input(name='user[name]')
+      //单行注释
+  div#demo
+    //- 该注释不被展示渲染
+  .test
+  .hello
+  #name
+  //if IE
+    a(href='http://www.liyangli.com') liyangli
+
+  //
+    #content
+        p liyangli nihao
+    sdfsdfe
+
+  p Hi
+  | li
+  | yangii
+  | love
+  | family
+  p \#{title}
+  p #{title}
+
   div.change
-    img(src='green.jpg')
     div.plant
       label(data_type='sm') 数码平台
     div.plant
       label(data_type='hl') 哈雷平台
+      label #{title}
+
 

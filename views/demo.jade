@@ -1,0 +1,37 @@
+//
+   Created by liyangli on 16/3/2.
+- friends = 5
+html
+    body
+
+        - users = [{id:1,name:'1'},{id:2,name:'2'}];
+
+        - for(var key in users)
+            - user = users[key]
+            p #{user.id}|#{user.name}
+        each user in users
+            p #{user.id}|#{user.name}
+
+
+        Hi you name :#{user.name} age:#{user.age} id:#{user.id}
+        div
+
+        input(type="checkbox" checked=true value="Hi")
+        label HI
+
+        - divClass = ["he","name","black"]
+
+        div(class=divClass) liyangli
+
+        | <div>HI</div>
+        | <span>can you help me</span>
+        div name
+        div.
+            <label>asdfad</label>
+            <div>测试完毕哟</div>
+
+        case friends
+            when 0: p you have no friends
+            when 1: p you hanve a friend
+            default: p you have #{friends}
+

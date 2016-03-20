@@ -4,12 +4,26 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var fs = require('fs');
 
 var routes = require('./routes/index');
+var protocol = require('./routes/protocol')
 var users = require('./routes/users');
+var temp = require('./routes/temp');
 
 var app = express();
 
+app.engine('ntl',function(filePath,options,callback){
+  console.info("hi ");
+  fs.readFile(filePath,function(err,content){
+    console.info(" i am in :"+content);
+    if(err)
+      return callback(new Error(err));
+    var rendered = content.toString().replace('#title#','<option>'+options.title+'</option>')
+        .replace('#message#','<h1>'+options.message + '</h1>');
+    return callback(null,rendered);
+  })
+});
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -24,6 +38,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/users', users);
+app.use('/temp',temp);
+app.use('/protocol',protocol);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
